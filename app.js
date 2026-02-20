@@ -308,7 +308,7 @@ async function onExportLatestClosurePdf() {
     let y = 18;
 
     try {
-      const logo = await loadImageDataUrl("assets/logo-mimar.png");
+      const logo = await loadImageDataUrl("assets/logo-mimar.jpg");
       doc.addImage(logo, "PNG", margin, y - 8, 55, 20);
       y += 16;
     } catch {
@@ -762,7 +762,7 @@ function exportClosureWithPrintFallback(closure) {
       </style>
     </head>
     <body>
-      <img src="assets/logo-mimar.png" alt="Mimar Textiles" class="logo" />
+      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="logo" />
       <h1>Cierre Mimar Textiles</h1>
       <p><strong>Periodo:</strong> ${fmtDate(closure.fromDate)} al ${fmtDate(closure.toDate)}</p>
       <p><strong>Pedidos:</strong> ${closure.ordersCount}</p>
