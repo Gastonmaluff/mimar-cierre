@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #f6f2e8;
   --card: #fffdf8;
   --text: #1e1b16;
@@ -112,6 +112,18 @@ h1, h2, h3 { margin: 0 0 12px; }
   margin-bottom: 10px;
 }
 
+.history-actions {
+  margin-top: 16px;
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+
+.small-btn {
+  padding: 7px 12px;
+  font-size: 13px;
+  width: auto;
+}
+
 label {
   display: grid;
   gap: 6px;
@@ -217,6 +229,14 @@ button.danger {
   }
 
   .actions button {
+    width: 100%;
+  }
+
+  .history-actions {
+    justify-content: stretch;
+  }
+
+  .small-btn {
     width: 100%;
   }
 }
