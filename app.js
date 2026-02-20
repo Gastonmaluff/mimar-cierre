@@ -1,4 +1,4 @@
-﻿const MONEY = new Intl.NumberFormat("es-PY", {
+const MONEY = new Intl.NumberFormat("es-PY", {
   style: "currency",
   currency: "PYG",
   maximumFractionDigits: 0
@@ -36,6 +36,7 @@ const el = {
   ordersList: document.getElementById("orders-list"),
   closeResult: document.getElementById("close-result"),
   closuresHistory: document.getElementById("closures-history"),
+  clearHistory: document.getElementById("clear-history"),
   fromDate: document.getElementById("from-date"),
   toDate: document.getElementById("to-date")
 };
@@ -50,6 +51,7 @@ function bindEvents() {
   el.addItem.addEventListener("click", onAddItemToCurrentOrder);
   el.addOrder.addEventListener("click", onAddOrder);
   el.finishClose.addEventListener("click", onFinishClose);
+  el.clearHistory.addEventListener("click", onClearHistory);
 
   [el.productCost, el.productGaston, el.productMaria].forEach((input) => {
     input.addEventListener("input", renderProductSalePreview);
@@ -59,6 +61,21 @@ function bindEvents() {
 function onToggleProducts() {
   state.productsVisible = !state.productsVisible;
   renderProductsVisibility();
+}
+
+function onClearHistory() {
+  if (state.closures.length === 0) {
+    alert("No hay historial para eliminar.");
+    return;
+  }
+
+  const confirmed = confirm("Estas seguro que deseas eliminar el historial?");
+  if (!confirmed) return;
+
+  state.closures = [];
+  save("closures", state.closures);
+  renderClosuresHistory();
+  alert("Historial eliminado.");
 }
 
 function onSaveProduct(event) {
