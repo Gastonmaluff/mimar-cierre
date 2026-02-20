@@ -762,7 +762,7 @@ function exportClosureWithPrintFallback(closure) {
       </style>
     </head>
     <body>
-      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="logo" />
+      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="logo" onerror="this.style.display='none'" />
       <h1>Cierre Mimar Textiles</h1>
       <p><strong>Periodo:</strong> ${fmtDate(closure.fromDate)} al ${fmtDate(closure.toDate)}</p>
       <p><strong>Pedidos:</strong> ${closure.ordersCount}</p>
