@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,10 @@
 </head>
 <body>
   <main class="container">
-    <h1>App de Cierre MIMAR</h1>
+    <div class="brand-top">
+      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="brand-logo" />
+      <h1 class="app-title">APP de Cierre Mimar textiles</h1>
+    </div>
 
     <section class="card">
       <div class="section-head">
@@ -60,6 +63,7 @@
         <h3>Carga de pedidos</h3>
         <div class="actions close-actions">
           <button type="button" id="add-order">Cargar nuevo pedido</button>
+          <button type="button" id="cancel-order" class="secondary" hidden>Cancelar pedido actual</button>
         </div>
 
         <div class="grid order-builder" id="order-builder" hidden>
@@ -82,6 +86,7 @@
         <h3>Resumen</h3>
         <div class="actions close-actions">
           <button type="button" id="finish-close" class="danger">Concluir cierre</button>
+          <button type="button" id="export-close-pdf" class="secondary">Exportar cierre PDF</button>
         </div>
 
         <div id="orders-list"></div>
@@ -98,6 +103,7 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

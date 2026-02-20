@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #f6f2e8;
   --card: #fffdf8;
   --text: #1e1b16;
@@ -25,6 +25,25 @@ body {
 }
 
 h1, h2, h3 { margin: 0 0 12px; }
+
+.brand-top {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.brand-logo {
+  width: min(320px, 75vw);
+  height: auto;
+  display: block;
+}
+
+.app-title {
+  text-align: center;
+  font-size: clamp(24px, 3.5vw, 34px);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
 
 .section-head {
   display: flex;

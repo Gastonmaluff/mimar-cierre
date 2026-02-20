@@ -1,4 +1,4 @@
-const MONEY = new Intl.NumberFormat("es-PY", {
+﻿const MONEY = new Intl.NumberFormat("es-PY", {
   style: "currency",
   currency: "PYG",
   maximumFractionDigits: 0
@@ -31,7 +31,9 @@ const el = {
   saleQty: document.getElementById("sale-qty"),
   addItem: document.getElementById("add-item"),
   addOrder: document.getElementById("add-order"),
+  cancelOrder: document.getElementById("cancel-order"),
   finishClose: document.getElementById("finish-close"),
+  exportClosePdf: document.getElementById("export-close-pdf"),
   currentOrder: document.getElementById("current-order"),
   ordersList: document.getElementById("orders-list"),
   closeResult: document.getElementById("close-result"),
@@ -50,7 +52,9 @@ function bindEvents() {
   el.toggleProducts.addEventListener("click", onToggleProducts);
   el.addItem.addEventListener("click", onAddItemToCurrentOrder);
   el.addOrder.addEventListener("click", onAddOrder);
+  el.cancelOrder.addEventListener("click", onCancelOrder);
   el.finishClose.addEventListener("click", onFinishClose);
+  el.exportClosePdf.addEventListener("click", onExportLatestClosurePdf);
   el.clearHistory.addEventListener("click", onClearHistory);
 
   [el.productCost, el.productGaston, el.productMaria].forEach((input) => {
@@ -75,6 +79,7 @@ function onClearHistory() {
   state.closures = [];
   save("closures", state.closures);
   renderClosuresHistory();
+  renderExportButtonState();
   alert("Historial eliminado.");
 }
 
@@ -198,6 +203,34 @@ function onAddOrder() {
   renderOrders();
 }
 
+function onCancelOrder() {
+  if (!state.orderInProgress) return;
+
+  if (state.currentItems.length > 0) {
+    const confirmed = confirm("Se perderan los productos agregados al pedido actual. Continuar?");
+    if (!confirmed) return;
+  }
+
+  state.currentItems = [];
+  state.orderInProgress = false;
+  el.orderName.value = "";
+  el.saleQty.value = "1";
+  renderOrderFlow();
+  renderCurrentOrder();
+}
+
+function onDeleteOrder(orderId) {
+  const order = state.orders.find((item) => item.id === orderId);
+  if (!order) return;
+
+  const orderName = order.name ? ` "${order.name}"` : "";
+  const confirmed = confirm(`Eliminar el pedido${orderName}?`);
+  if (!confirmed) return;
+
+  state.orders = state.orders.filter((item) => item.id !== orderId);
+  renderOrders();
+}
+
 function onFinishClose() {
   if (!validateDates()) return;
   if (state.orders.length === 0) {
@@ -236,7 +269,101 @@ function onFinishClose() {
       <p class="total-line">Total venta: ${MONEY.format(totals.sale)}</p>
     </div>
   `;
+
+  state.orders = [];
+  state.currentItems = [];
+  state.orderInProgress = false;
+  el.orderName.value = "";
+  el.saleQty.value = "1";
+  renderOrderFlow();
+  renderCurrentOrder();
+  renderOrders();
   renderClosuresHistory();
+  renderExportButtonState();
+}
+
+async function onExportLatestClosurePdf() {
+  if (state.closures.length === 0) {
+    alert("No hay cierres para exportar.");
+    return;
+  }
+
+  const latest = state.closures[0];
+  const jsPdfApi = window.jspdf?.jsPDF;
+  if (!jsPdfApi) {
+    exportClosureWithPrintFallback(latest);
+    return;
+  }
+
+  try {
+    const doc = new jsPdfApi({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    const margin = 14;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxTextWidth = pageWidth - margin * 2;
+    let y = 18;
+
+    try {
+      const logo = await loadImageDataUrl("assets/logo-mimar.jpg");
+      doc.addImage(logo, "PNG", margin, y - 8, 55, 20);
+      y += 16;
+    } catch {
+      // Si falla la carga del logo, continuamos exportando el cierre sin imagen.
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.text("Cierre Mimar Textiles", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Periodo: ${fmtDate(latest.fromDate)} al ${fmtDate(latest.toDate)}`, margin, y);
+    y += 6;
+    doc.text(`Pedidos: ${latest.ordersCount}`, margin, y);
+    y += 6;
+    doc.text(`Generado: ${fmtDateTime(latest.createdAt)}`, margin, y);
+    y += 10;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Pago por proveedor", margin, y);
+    y += 6;
+    doc.setFont("helvetica", "normal");
+
+    const providerLines = Object.entries(latest.providerTotals)
+      .sort((a, b) => a[0].localeCompare(b[0], "es"))
+      .map(([provider, total]) => `${provider}: ${MONEY.format(total)}`);
+
+    if (providerLines.length === 0) {
+      doc.text("Sin proveedores", margin, y);
+      y += 6;
+    } else {
+      providerLines.forEach((line) => {
+        const wrapped = doc.splitTextToSize(line, maxTextWidth);
+        doc.text(wrapped, margin, y);
+        y += wrapped.length * 5;
+      });
+    }
+
+    y += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total Gaston: ${MONEY.format(latest.totals.gaston)}`, margin, y);
+    y += 6;
+    doc.text(`Total Maria: ${MONEY.format(latest.totals.maria)}`, margin, y);
+    y += 6;
+    doc.text(`Total Venta: ${MONEY.format(latest.totals.sale)}`, margin, y);
+
+    const fileName = `cierre-mimar-${latest.fromDate}-${latest.toDate}.pdf`;
+    doc.save(fileName);
+  } catch (error) {
+    console.error(error);
+    alert("Hubo un error al generar el PDF. Se abrira la opcion de imprimir como alternativa.");
+    exportClosureWithPrintFallback(latest);
+  }
 }
 
 function validateDates() {
@@ -265,6 +392,7 @@ function renderAll() {
   renderOrders();
   renderProductSalePreview();
   renderClosuresHistory();
+  renderExportButtonState();
 }
 
 function renderClosuresHistory() {
@@ -292,6 +420,17 @@ function renderClosuresHistory() {
       `;
     })
     .join("");
+}
+
+function renderExportButtonState() {
+  if (state.closures.length === 0) {
+    el.exportClosePdf.textContent = "Exportar cierre PDF";
+    el.exportClosePdf.title = "Primero conclui un cierre para exportar.";
+    return;
+  }
+
+  el.exportClosePdf.textContent = "Exportar cierre PDF";
+  el.exportClosePdf.title = "Exportar el ultimo cierre guardado.";
 }
 
 function renderProductsVisibility() {
@@ -378,6 +517,7 @@ function renderProductOptions() {
 function renderOrderFlow() {
   const show = state.orderInProgress;
   el.orderBuilder.hidden = !show;
+  el.cancelOrder.hidden = !show;
   el.orderBuilder.classList.toggle("active", show);
   el.addOrder.textContent = state.orderInProgress ? "Guardar pedido" : "Cargar nuevo pedido";
 }
@@ -445,10 +585,17 @@ function renderOrders() {
               .join("")}
           </ul>
           <p class="total-line">${totalLine}</p>
+          <div class="actions">
+            <button type="button" data-delete-order="${order.id}" class="danger">Eliminar pedido</button>
+          </div>
         </div>
       `;
     })
     .join("");
+
+  el.ordersList.querySelectorAll("[data-delete-order]").forEach((btn) => {
+    btn.addEventListener("click", () => onDeleteOrder(btn.dataset.deleteOrder));
+  });
 }
 
 function resolveItems(items) {
@@ -566,4 +713,72 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function loadImageDataUrl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("No se pudo crear el contexto del canvas."));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => reject(new Error("No se pudo cargar la imagen."));
+    img.src = src;
+  });
+}
+
+function exportClosureWithPrintFallback(closure) {
+  const popup = window.open("", "_blank");
+  if (!popup) {
+    alert("El navegador bloqueo la ventana de exportacion. Habilita popups e intenta de nuevo.");
+    return;
+  }
+
+  const providerRows = Object.entries(closure.providerTotals)
+    .sort((a, b) => a[0].localeCompare(b[0], "es"))
+    .map(([provider, total]) => `<li>${escapeHtml(provider)}: ${MONEY.format(total)}</li>`)
+    .join("");
+
+  popup.document.write(`
+    <!doctype html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Cierre Mimar</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 24px; color: #111; }
+        .logo { width: 240px; height: auto; margin-bottom: 10px; }
+        h1 { font-size: 22px; margin: 0 0 10px; }
+        p, li { font-size: 14px; margin: 6px 0; }
+        .totals { margin-top: 14px; font-weight: 700; }
+      </style>
+    </head>
+    <body>
+      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="logo" />
+      <h1>Cierre Mimar Textiles</h1>
+      <p><strong>Periodo:</strong> ${fmtDate(closure.fromDate)} al ${fmtDate(closure.toDate)}</p>
+      <p><strong>Pedidos:</strong> ${closure.ordersCount}</p>
+      <p><strong>Generado:</strong> ${fmtDateTime(closure.createdAt)}</p>
+      <h2>Pago por proveedor</h2>
+      <ul>${providerRows || "<li>Sin proveedores</li>"}</ul>
+      <p class="totals">Total Gaston: ${MONEY.format(closure.totals.gaston)}</p>
+      <p class="totals">Total Maria: ${MONEY.format(closure.totals.maria)}</p>
+      <p class="totals">Total Venta: ${MONEY.format(closure.totals.sale)}</p>
+      <script>
+        window.onload = function () {
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  popup.document.close();
 }
