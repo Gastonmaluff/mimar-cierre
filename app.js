@@ -307,14 +307,6 @@ async function onExportLatestClosurePdf() {
     const maxTextWidth = pageWidth - margin * 2;
     let y = 18;
 
-    try {
-      const logo = await loadImageDataUrl("assets/logo-mimar.jpg");
-      doc.addImage(logo, "PNG", margin, y - 8, 55, 20);
-      y += 16;
-    } catch {
-      // Si falla la carga del logo, continuamos exportando el cierre sin imagen.
-    }
-
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
     doc.text("Cierre Mimar Textiles", margin, y);
@@ -715,26 +707,6 @@ function escapeHtml(text) {
     .replaceAll("'", "&#39;");
 }
 
-function loadImageDataUrl(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("No se pudo crear el contexto del canvas."));
-        return;
-      }
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/png"));
-    };
-    img.onerror = () => reject(new Error("No se pudo cargar la imagen."));
-    img.src = src;
-  });
-}
-
 function exportClosureWithPrintFallback(closure) {
   const popup = window.open("", "_blank");
   if (!popup) {
@@ -762,7 +734,6 @@ function exportClosureWithPrintFallback(closure) {
       </style>
     </head>
     <body>
-      <img src="assets/logo-mimar.jpg" alt="Mimar Textiles" class="logo" onerror="this.style.display='none'" />
       <h1>Cierre Mimar Textiles</h1>
       <p><strong>Periodo:</strong> ${fmtDate(closure.fromDate)} al ${fmtDate(closure.toDate)}</p>
       <p><strong>Pedidos:</strong> ${closure.ordersCount}</p>
