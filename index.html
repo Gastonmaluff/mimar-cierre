@@ -1,0 +1,100 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cierre MIMAR</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>App de Cierre MIMAR</h1>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>1) Productos</h2>
+      </div>
+      <form id="product-form" class="grid">
+        <input type="hidden" id="product-id" />
+        <label>Producto
+          <input id="product-name" required />
+        </label>
+        <label>Proveedor
+          <input id="product-provider" required />
+        </label>
+        <label>Costo proveedor
+          <input id="product-cost" type="number" min="0" step="1" required />
+        </label>
+        <label>Ganancia Gaston
+          <input id="product-gaston" type="number" min="0" step="1" required />
+        </label>
+        <label>Ganancia Maria
+          <input id="product-maria" type="number" min="0" step="1" required />
+        </label>
+        <p id="sale-price-preview" class="total-line">Precio venta del producto: Gs. 0</p>
+        <div class="actions">
+          <button type="submit" id="save-product">Guardar producto</button>
+          <button type="button" id="clear-form" class="secondary">Limpiar</button>
+          <button type="button" id="toggle-products" class="secondary push-right">Ocultar lista de productos</button>
+        </div>
+      </form>
+
+      <div id="products-list"></div>
+    </section>
+
+    <section class="card">
+      <h2>2) Cierre</h2>
+      <div class="close-block">
+        <h3>Fechas del cierre</h3>
+        <div class="grid close-dates">
+          <label>Fecha desde
+            <input id="from-date" type="date" required />
+          </label>
+          <label>Fecha hasta
+            <input id="to-date" type="date" required />
+          </label>
+        </div>
+      </div>
+
+      <div class="close-block">
+        <h3>Carga de pedidos</h3>
+        <div class="actions close-actions">
+          <button type="button" id="add-order">Cargar nuevo pedido</button>
+        </div>
+
+        <div class="grid order-builder" id="order-builder" hidden>
+          <label>Nombre del pedido (opcional)
+            <input id="order-name" maxlength="50" placeholder="Ej: Pedido cliente Ana" />
+          </label>
+          <label>Producto vendido
+            <select id="sale-product"></select>
+          </label>
+          <label>Cantidad
+            <input id="sale-qty" type="number" min="1" step="1" value="1" />
+          </label>
+          <button type="button" id="add-item" class="secondary">Agregar producto al pedido actual</button>
+        </div>
+
+        <div id="current-order"></div>
+      </div>
+
+      <div class="close-block">
+        <h3>Resumen</h3>
+        <div class="actions close-actions">
+          <button type="button" id="finish-close" class="danger">Concluir cierre</button>
+        </div>
+
+        <div id="orders-list"></div>
+        <div id="close-result"></div>
+      </div>
+
+      <div class="close-block">
+        <h3>Historial de cierres</h3>
+        <div id="closures-history"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

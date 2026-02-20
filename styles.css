@@ -1,0 +1,222 @@
+﻿:root {
+  --bg: #f6f2e8;
+  --card: #fffdf8;
+  --text: #1e1b16;
+  --primary: #b4451f;
+  --secondary: #d8c9b1;
+  --danger: #8e1f1f;
+  --border: #d7ccb9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, #efe7d8 0%, var(--bg) 100%);
+}
+
+.container {
+  width: min(1000px, 92vw);
+  margin: 24px auto;
+  display: grid;
+  gap: 16px;
+}
+
+h1, h2, h3 { margin: 0 0 12px; }
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+#toggle-products {
+  width: auto;
+  white-space: nowrap;
+}
+
+.actions .push-right {
+  margin-left: auto;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+#product-form {
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  align-items: end;
+}
+
+#product-form label {
+  min-width: 0;
+}
+
+#product-form input {
+  width: 100%;
+  min-width: 0;
+}
+
+#sale-price-preview,
+#product-form .actions {
+  grid-column: 1 / -1;
+}
+
+.order-builder {
+  display: none;
+}
+
+.order-builder.active {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) 120px auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.close-block {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  margin-top: 12px;
+}
+
+.close-block h3 {
+  margin-bottom: 10px;
+}
+
+.close-dates {
+  grid-template-columns: repeat(2, minmax(180px, 240px));
+  justify-content: start;
+}
+
+.close-actions {
+  margin-bottom: 10px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+input, select, button {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  font-size: 14px;
+}
+
+input,
+select {
+  width: 100%;
+  min-width: 0;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+button.secondary {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+button.danger {
+  background: var(--danger);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.toolbar {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  padding: 8px;
+}
+
+.small {
+  font-size: 13px;
+  color: #534b42;
+}
+
+.box {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  background: #fff;
+}
+
+.total-line {
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #toggle-products {
+    width: 100%;
+  }
+
+  .actions .push-right {
+    margin-left: 0;
+  }
+
+  #product-form {
+    grid-template-columns: 1fr;
+  }
+
+  .close-dates,
+  .order-builder.active {
+    grid-template-columns: 1fr;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
